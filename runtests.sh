@@ -23,6 +23,8 @@ if [ "$GITHUB_BASE_REV" != "" ]; then
     git checkout -q $GITHUB_BASE_REV
 fi
 
+PERL5LIB=$BUGZILLA_ROOT/local/lib/perl5
+export PERL5LIB
 if [ "$TEST_SUITE" = "sanity" ]; then
     cd $BUGZILLA_ROOT
     /buildbot_step "Sanity" prove -f -v t/*.t

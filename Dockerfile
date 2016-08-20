@@ -1,10 +1,6 @@
 FROM mozillabteam/bmo-base:latest
 MAINTAINER David Lawrence <dkl@mozilla.com>
 
-RUN rsync -a /opt/bmo/local/lib/perl5/x86_64-linux-thread-multi/ /usr/local/lib64/perl5/ && \
-    rsync -a --exclude x86_64-linux-thread-multi/ \
-        /opt/bmo/local/lib/perl5/ /usr/local/share/perl5/
-
 # Environment configuration
 ENV BUGS_DB_DRIVER mysql
 ENV BUGS_DB_NAME bugs
@@ -16,8 +12,8 @@ ENV BUGZILLA_HOME /home/$BUGZILLA_USER
 ENV BUGZILLA_ROOT $BUGZILLA_HOME/devel/htdocs/bmo
 ENV BUGZILLA_URL http://localhost/bmo
 
-ENV GITHUB_BASE_GIT https://github.com/mozilla-bteam/bmo
-ENV GITHUB_BASE_BRANCH master
+ENV GITHUB_BASE_GIT https://github.com/dylan/bmo
+ENV GITHUB_BASE_BRANCH bug-1283930
 
 ENV ADMIN_EMAIL admin@mozilla.bugs
 ENV ADMIN_PASS password
@@ -45,6 +41,7 @@ RUN chown root.root /etc/sudoers && chmod 440 /etc/sudoers
 
 # Clone the code repo
 RUN su $BUGZILLA_USER -c "git clone $GITHUB_BASE_GIT -b $GITHUB_BASE_BRANCH $BUGZILLA_ROOT"
+ln -s /opt/bmo/local $BUGZILLA_ROOT/local
 
 # Copy setup and test scripts
 COPY *.sh generate_bmo_data.pl buildbot_step checksetup_answers.txt /
