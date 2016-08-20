@@ -12,7 +12,7 @@ ENV BUGZILLA_HOME /home/$BUGZILLA_USER
 ENV BUGZILLA_ROOT $BUGZILLA_HOME/devel/htdocs/bmo
 ENV BUGZILLA_URL http://localhost/bmo
 
-ENV GITHUB_BASE_GIT https://github.com/dylan/bmo
+ENV GITHUB_BASE_GIT https://github.com/dylanwh/bmo
 ENV GITHUB_BASE_BRANCH bug-1283930
 
 ENV ADMIN_EMAIL admin@mozilla.bugs
