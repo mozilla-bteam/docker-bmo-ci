@@ -25,7 +25,7 @@ fi
 
 if [ "$TEST_SUITE" = "sanity" ]; then
     cd $BUGZILLA_ROOT
-    /buildbot_step "Sanity" prove -f -v t/*.t
+    buildbot_step "Sanity" prove -f -v t/*.t
     exit $?
 fi
 
@@ -33,7 +33,7 @@ if [ "$TEST_SUITE" = "docs" ]; then
     export JADE_PUB=/usr/share/sgml
     export LDP_HOME=/usr/share/sgml/docbook/dsssl-stylesheets-1.79/dtds/decls
     cd $BUGZILLA_ROOT/docs
-    /buildbot_step "Documentation" perl makedocs.pl --with-pdf
+    buildbot_step "Documentation" perl makedocs.pl --with-pdf
     exit $?
 fi
 
@@ -59,7 +59,7 @@ cd $BUGZILLA_ROOT
 ./checksetup.pl qa/config/checksetup_answers.txt
 
 echo -e "\n== Generating bmo data"
-perl /generate_bmo_data.pl
+generate_bmo_data.pl
 
 echo -e "\n== Generating test data"
 cd $BUGZILLA_ROOT/qa/config
@@ -90,12 +90,12 @@ if [ "$TEST_SUITE" = "selenium" ]; then
     [ $NO_TESTS ] && exit 0
 
     cd $BUGZILLA_ROOT/qa/t
-    /buildbot_step "Selenium" prove -f -v -I$BUGZILLA_ROOT/lib test_*.t
+    buildbot_step "Selenium" prove -f -v -I$BUGZILLA_ROOT/lib test_*.t
     exit $?
 fi
 
 if [ "$TEST_SUITE" = "webservices" ]; then
     cd $BUGZILLA_ROOT/qa/t
-    /buildbot_step "Webservices" prove -f -v -I$BUGZILLA_ROOT/lib webservice_*.t
+    buildbot_step "Webservices" prove -f -v -I$BUGZILLA_ROOT/lib webservice_*.t
     exit $?
 fi

@@ -28,10 +28,10 @@ RUN useradd -m -G wheel -u 1000 -s /bin/bash $BUGZILLA_USER \
     && echo "bugzilla:bugzilla" | chpasswd
 
 # Apache configuration
-COPY bugzilla.conf /etc/httpd/conf.d/bugzilla.conf
+COPY conf/bugzilla.conf /etc/httpd/conf.d/bugzilla.conf
 
 # MySQL configuration
-COPY my.cnf /etc/my.cnf
+COPY conf/my.cnf /etc/my.cnf
 RUN chmod 644 /etc/my.cnf \
     && chown root.root /etc/my.cnf \
     && rm -vrf /etc/mysql \
@@ -40,19 +40,20 @@ RUN chmod 644 /etc/my.cnf \
 RUN /usr/bin/mysql_install_db --user=$BUGZILLA_USER --basedir=/usr --datadir=/var/lib/mysql
 
 # Sudoer configuration
-COPY sudoers /etc/sudoers
+COPY conf/sudoers /etc/sudoers
 RUN chown root.root /etc/sudoers && chmod 440 /etc/sudoers
 
 # Clone the code repo
 RUN su $BUGZILLA_USER -c "git clone $GITHUB_BASE_GIT -b $GITHUB_BASE_BRANCH $BUGZILLA_ROOT"
 
 # Copy setup and test scripts
-COPY *.sh generate_bmo_data.pl buildbot_step checksetup_answers.txt /
-RUN chmod 755 /*.sh /buildbot_step
+COPY conf/checksetup_answers.txt /etc/
+COPY scripts/* /usr/local/bin/
+RUN chmod 755 /usr/local/bin/*
 
 # Bugzilla dependencies and setup
-RUN /bugzilla_config.sh
-RUN /my_config.sh
+RUN bugzilla_config.sh
+RUN my_config.sh
 
 # Final permissions fix
 RUN chown -R $BUGZILLA_USER.$BUGZILLA_USER $BUGZILLA_HOME
@@ -67,6 +68,6 @@ EXPOSE 22
 EXPOSE 5900
 
 # Supervisor
-COPY supervisord.conf /etc/supervisord.conf
+COPY conf/supervisord.conf /etc/supervisord.conf
 RUN chmod 700 /etc/supervisord.conf
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
