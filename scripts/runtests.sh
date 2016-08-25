@@ -10,7 +10,7 @@ fi
 set -e
 
 # Output to log file as well as STDOUT/STDERR
-exec > >(tee /runtests.log) 2>&1
+exec > >(tee /var/log/runtests.log) 2>&1
 
 echo "== Retrieving Bugzilla code"
 echo "Checking out $GITHUB_BASE_GIT $GITHUB_BASE_BRANCH ..."
