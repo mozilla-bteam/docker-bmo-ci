@@ -33,7 +33,6 @@ RUN chmod 644 /etc/my.cnf \
 RUN /usr/bin/mysql_install_db --user=$BUGZILLA_USER --basedir=/usr --datadir=/var/lib/mysql
 
 # Copy setup and test scripts
-COPY conf/selenium_conf.patch /
 COPY scripts/* /usr/local/bin/
 RUN chmod 755 /usr/local/bin/*
 
