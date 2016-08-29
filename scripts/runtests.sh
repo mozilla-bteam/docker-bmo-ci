@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -7,14 +7,11 @@ if [ -z "$TEST_SUITE" ]; then
     TEST_SUITE=sanity
 fi
 
-set -e
-
 # Output to log file as well as STDOUT/STDERR
 exec > >(tee /var/log/runtests.log) 2>&1
 
 echo "== Retrieving Bugzilla code"
 echo "Checking out $GITHUB_BASE_GIT $GITHUB_BASE_BRANCH ..."
-mv $BUGZILLA_ROOT "${BUGZILLA_ROOT}.back"
 git clone $GITHUB_BASE_GIT --branch $GITHUB_BASE_BRANCH $BUGZILLA_ROOT
 cd $BUGZILLA_ROOT
 ln -s /opt/bmo/local $BUGZILLA_ROOT/local
@@ -23,15 +20,14 @@ if [ "$GITHUB_BASE_REV" != "" ]; then
     git checkout -q $GITHUB_BASE_REV
 fi
 
+chown -R $BUGZILLA_USER.$BUGZILLA_USER $BUGZILLA_ROOT
+
 if [ "$TEST_SUITE" = "sanity" ]; then
-    cd $BUGZILLA_ROOT
     buildbot_step "Sanity" prove -f -v t/*.t
     exit $?
 fi
 
 if [ "$TEST_SUITE" = "docs" ]; then
-    export JADE_PUB=/usr/share/sgml
-    export LDP_HOME=/usr/share/sgml/docbook/dsssl-stylesheets-1.79/dtds/decls
     cd $BUGZILLA_ROOT/docs
     buildbot_step "Documentation" perl makedocs.pl --with-pdf
     exit $?
@@ -46,12 +42,14 @@ echo -e "\n== Starting memcached"
 sleep 10
 
 echo -e "\n== Updating configuration"
+mysql -u root mysql -e "GRANT ALL PRIVILEGES ON *.* TO bugs@localhost IDENTIFIED BY 'bugs'; FLUSH PRIVILEGES;" || exit 1
 mysql -u root mysql -e "CREATE DATABASE bugs_test CHARACTER SET = 'utf8';" || exit 1
 mysql -u root mysql -e "GRANT ALL PRIVILEGES ON bugs_test.* TO bugs@'%' IDENTIFIED BY 'bugs'; FLUSH PRIVILEGES;" || exit 1
 sed -e "s?%DB%?$BUGS_DB_DRIVER?g" --in-place $BUGZILLA_ROOT/qa/config/checksetup_answers.txt
 sed -e "s?%DB_NAME%?bugs_test?g" --in-place $BUGZILLA_ROOT/qa/config/checksetup_answers.txt
 sed -e "s?%USER%?$BUGZILLA_USER?g" --in-place $BUGZILLA_ROOT/qa/config/checksetup_answers.txt
 echo "\$answer{'memcached_servers'} = 'localhost:11211';" >> $BUGZILLA_ROOT/qa/config/checksetup_answers.txt
+patch -p1 < /selenium_conf.patch
 
 echo -e "\n== Running checksetup"
 cd $BUGZILLA_ROOT
@@ -66,9 +64,12 @@ cd $BUGZILLA_ROOT/qa/config
 perl generate_test_data.pl
 
 echo -e "\n== Starting web server"
-sed -e "s?^#Perl?Perl?" --in-place /etc/httpd/conf.d/bugzilla.conf
+perl -i -pe 's/^User apache/User bugzilla/' /etc/httpd/conf/httpd.conf
+perl -i -pe 's/^Group apache/Group bugzilla/' /etc/httpd/conf/httpd.conf
 /usr/sbin/httpd &
 sleep 10
+
+cd $BUGZILLA_ROOT/qa/t
 
 if [ "$TEST_SUITE" = "selenium" ]; then
     export DISPLAY=:0
@@ -89,13 +90,11 @@ if [ "$TEST_SUITE" = "selenium" ]; then
     # but no tests actually executed.
     [ $NO_TESTS ] && exit 0
 
-    cd $BUGZILLA_ROOT/qa/t
     buildbot_step "Selenium" prove -f -v -I$BUGZILLA_ROOT/lib test_*.t
     exit $?
 fi
 
 if [ "$TEST_SUITE" = "webservices" ]; then
-    cd $BUGZILLA_ROOT/qa/t
     buildbot_step "Webservices" prove -f -v -I$BUGZILLA_ROOT/lib webservice_*.t
     exit $?
 fi
