@@ -1,5 +1,5 @@
 FROM mozillabteam/bmo-base:latest
-MAINTAINER Dylan Hardisson <dylan@mozilla.com>, David Lawrence <dkl@mozilla.com>
+MAINTAINER Dylan Hardison <dylan@mozilla.com>, David Lawrence <dkl@mozilla.com>
 
 RUN rsync -a /opt/bmo/local/lib/perl5/x86_64-linux-thread-multi/ /usr/local/lib64/perl5/ && \
     rsync -a --exclude x86_64-linux-thread-multi/ \
