@@ -14,6 +14,7 @@ ENV BUGZILLA_ROOT /var/www/html/bmo
 
 ENV GITHUB_BASE_GIT https://github.com/mozilla-bteam/bmo
 ENV GITHUB_BASE_BRANCH master
+ENV PATCH_DIR /patch_dir
 
 # User configuration
 RUN useradd -m -G wheel -u 1000 -s /bin/bash $BUGZILLA_USER \
@@ -37,7 +38,7 @@ COPY scripts/* /usr/local/bin/
 RUN chmod 755 /usr/local/bin/*
 
 # Testing scripts for CI
-ADD https://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.0.jar /selenium-server.jar
+ADD https://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.1.jar /selenium-server.jar
 
 # Networking
 RUN echo "NETWORKING=yes" > /etc/sysconfig/network

@@ -20,6 +20,10 @@ if [ "$GITHUB_BASE_REV" != "" ]; then
     git checkout -q $GITHUB_BASE_REV
 fi
 
+if [ "$TEST_PATCH" != "" ]; then
+    patch -p1 < $PATCH_DIR/$TEST_PATCH
+fi
+
 chown -R $BUGZILLA_USER.$BUGZILLA_USER $BUGZILLA_ROOT
 
 if [ "$TEST_SUITE" = "sanity" ]; then
