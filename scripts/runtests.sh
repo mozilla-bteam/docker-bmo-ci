@@ -15,16 +15,16 @@ echo "Checking out $GITHUB_BASE_GIT $GITHUB_BASE_BRANCH ..."
 git clone $GITHUB_BASE_GIT --branch $GITHUB_BASE_BRANCH $BUGZILLA_ROOT
 cd $BUGZILLA_ROOT
 ln -s /opt/bmo/local $BUGZILLA_ROOT/local
-if [ "$GITHUB_BASE_REV" != "" ]; then
-    echo "Switching to revision $GITHUB_BASE_REV ..."
-    git checkout -q $GITHUB_BASE_REV
+if [ "$GITHUB_HEAD_SHA" != "" ]; then
+    echo "Switching to revision $GITHUB_HEAD_SHA ..."
+    git checkout -q $GITHUB_HEAD_SHA
 fi
 
 if [ "$TEST_PATCH" != "" ]; then
     patch -p1 < $PATCH_DIR/$TEST_PATCH
 fi
 
-chown -R $BUGZILLA_USER.$BUGZILLA_USER $BUGZILLA_ROOT
+chown -R $BUGZILLA_USER.games $BUGZILLA_ROOT
 
 if [ "$TEST_SUITE" = "sanity" ]; then
     buildbot_step "Sanity" prove -f -v t/*.t
