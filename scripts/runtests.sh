@@ -60,7 +60,7 @@ cd $BUGZILLA_ROOT
 ./checksetup.pl qa/config/checksetup_answers.txt
 
 echo -e "\n== Generating bmo data"
-generate_bmo_data.pl
+perl scripts/generate_bmo_data.pl
 
 echo -e "\n== Generating test data"
 cd $BUGZILLA_ROOT/qa/config
