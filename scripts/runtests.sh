@@ -26,6 +26,8 @@ fi
 
 chown -R $BUGZILLA_USER.games $BUGZILLA_ROOT
 
+buildbot_step "Makefile.PL" perl Makefile.PL
+
 if [ "$TEST_SUITE" = "sanity" ]; then
     buildbot_step "Sanity" prove -f -v t/*.t
     exit $?
