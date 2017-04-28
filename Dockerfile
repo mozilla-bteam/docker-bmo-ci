@@ -15,6 +15,7 @@ ENV BUGZILLA_ROOT /var/www/html/bmo
 ENV GITHUB_BASE_GIT https://github.com/mozilla-bteam/bmo
 ENV GITHUB_BASE_BRANCH master
 ENV PATCH_DIR /patch_dir
+ENV BUGZILLA_UNSAFE_AUTH_DELEGATION 1
 
 # User configuration
 RUN useradd -m -G wheel -u 1000 -s /bin/bash $BUGZILLA_USER \
