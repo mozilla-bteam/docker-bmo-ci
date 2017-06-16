@@ -47,7 +47,7 @@ echo -e "\n== Starting memcached"
 /usr/bin/memcached -u memcached -d
 sleep 10
 
-if mysqladmin -u root status | grep -q 'mysql running'; then
+if mysqladmin -u root status | grep -vq 'mysql running'; then
     echo "mysql running"
 else
     echo "mysql not running"
@@ -96,7 +96,7 @@ if [ "$TEST_SUITE" = "selenium" ]; then
 
     echo -e "\n== Starting Selenium server"
     java -jar /selenium-server.jar -log /selenium.log > /dev/null 2>&1 &
-    sleep 5
+    sleep 20
 
     # Set NO_TESTS=1 if just want selenium services
     # but no tests actually executed.
