@@ -47,6 +47,13 @@ echo -e "\n== Starting memcached"
 /usr/bin/memcached -u memcached -d
 sleep 10
 
+if mysqladmin -u root status | grep -q 'mysql running'; then
+    echo "mysql running"
+else
+    echo "mysql not running"
+    exit 1
+fi
+
 echo -e "\n== Updating configuration"
 mysql -u root mysql -e "GRANT ALL PRIVILEGES ON *.* TO bugs@localhost IDENTIFIED BY 'bugs'; FLUSH PRIVILEGES;" || exit 1
 mysql -u root mysql -e "CREATE DATABASE bugs_test CHARACTER SET = 'utf8';" || exit 1
