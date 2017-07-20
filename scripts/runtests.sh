@@ -29,7 +29,7 @@ chown -R $BUGZILLA_USER.games $BUGZILLA_ROOT
 buildbot_step "Makefile.PL" perl Makefile.PL
 
 if [ "$TEST_SUITE" = "sanity" ]; then
-    buildbot_step "Sanity" prove t/*.t
+    buildbot_step "Sanity" prove -f t/*.t
     exit $?
 fi
 
@@ -102,11 +102,11 @@ if [ "$TEST_SUITE" = "selenium" ]; then
     # but no tests actually executed.
     [ $NO_TESTS ] && exit 0
 
-    buildbot_step "Selenium" prove -I$BUGZILLA_ROOT/lib test_*.t
+    buildbot_step "Selenium" prove -f -I$BUGZILLA_ROOT/lib test_*.t
     exit $?
 fi
 
 if [ "$TEST_SUITE" = "webservices" ]; then
-    buildbot_step "Webservices" prove -I$BUGZILLA_ROOT/lib webservice_*.t
+    buildbot_step "Webservices" prove -f -I$BUGZILLA_ROOT/lib webservice_*.t
     exit $?
 fi
